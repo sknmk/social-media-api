@@ -1,5 +1,5 @@
 from django import forms
-from blog.models import Post
+from blog.models import Post, Comment
 from django.contrib.auth.models import User
 
 
@@ -16,3 +16,9 @@ class LoginForm(forms.ModelForm):
         widgets = {
             'password': forms.PasswordInput()
         }
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('author', 'text')
