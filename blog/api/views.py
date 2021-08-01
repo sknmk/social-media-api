@@ -1,66 +1,50 @@
-from rest_framework import status
+from rest_framework import permissions
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from django.utils import timezone
 from blog.models import Post, Comment
 from blog.api.serializers import PostSerializer, CommentSerializer
+from blog.api.permissions import isAdminOrIsAuthorOrReadOnly
+from blog.api.pagination import SmallPagination, LargePagination
 
 
-class PostList(APIView):
-    def get(self, request):
-        post = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
-        serializer = PostSerializer(post, many=True)
+class PostList(ListCreateAPIView):
+
+    queryset = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    pagination_class = SmallPagination
+
+    def list(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = PostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        return serializer.save(author=self.request.user)
 
 
-class PostDetail(APIView):
-    def get_object(self, pk):
-        instance = get_object_or_404(Post, pk=pk)
-        return instance
+class PostDetail(RetrieveUpdateDestroyAPIView):
 
-    def get(self, request, pk):
-        post = self.get_object(pk=pk)
-        serializer = PostSerializer(post)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        post = self.get_object(pk=pk)
-        serializer = PostSerializer(post, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        post = self.get_object(pk=pk)
-        post.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [isAdminOrIsAuthorOrReadOnly]
 
 
-class PostComment(APIView):
+class PostComment(ListCreateAPIView):
 
-    def get(self, request, pk):
-        comment = get_object_or_404(Comment, post_id=pk)
-        serializer = CommentSerializer(comment)
-        return Response(serializer.data)
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    lookup_field = ['post_id']
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def put(self, request, pk):
-        comment = get_object_or_404(Comment, post_id=pk)
-        serializer = CommentSerializer(comment, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk):
-        comment = get_object_or_404(Comment, post_id=pk)
-        comment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class PostCommentDetail(RetrieveUpdateDestroyAPIView):
+
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [isAdminOrIsAuthorOrReadOnly]

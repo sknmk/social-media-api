@@ -30,6 +30,8 @@ class PostSerializer(serializers.ModelSerializer):
             return 'Post is not published yet.'
 
     def validate_published_date(self, published_date):
+        if not published_date:
+            return None
         today = published_date.today()
         if published_date < today:
             raise serializers.ValidationError('Invalid publish date.')
