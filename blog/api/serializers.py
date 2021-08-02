@@ -21,10 +21,10 @@ class PostSerializer(serializers.ModelSerializer):
         # fields = ['slug', 'title', 'text', 'author']
         read_only_fields = ['id', 'created_date', 'author', 'comments']
 
-    def get_time_since_pub(self, object):
+    def get_time_since_pub(self, instance):
         now = datetime.now().astimezone()
-        if object.published_date:
-            time_delta = timesince(object.published_date, now)
+        if instance.published_date:
+            time_delta = timesince(instance.published_date, now)
             return time_delta + ' ago.'
         else:
             return 'Post is not published yet.'

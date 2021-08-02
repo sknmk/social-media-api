@@ -4,18 +4,17 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from django.utils import timezone
 from blog.models import Post, Comment
 from blog.api.serializers import PostSerializer, CommentSerializer
-from blog.api.permissions import isAdminOrIsAuthorOrReadOnly
+from blog.api.permissions import IsAdminOrIsAuthorOrReadOnly
 from blog.api.pagination import SmallPagination, LargePagination
 
 
 class PostList(ListCreateAPIView):
-
     queryset = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = SmallPagination
 
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -29,14 +28,12 @@ class PostList(ListCreateAPIView):
 
 
 class PostDetail(RetrieveUpdateDestroyAPIView):
-
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [isAdminOrIsAuthorOrReadOnly]
+    permission_classes = [IsAdminOrIsAuthorOrReadOnly]
 
 
 class PostComment(ListCreateAPIView):
-
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     lookup_field = ['post_id']
@@ -44,7 +41,6 @@ class PostComment(ListCreateAPIView):
 
 
 class PostCommentDetail(RetrieveUpdateDestroyAPIView):
-
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [isAdminOrIsAuthorOrReadOnly]
+    permission_classes = [IsAdminOrIsAuthorOrReadOnly]

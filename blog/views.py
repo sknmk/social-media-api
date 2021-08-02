@@ -94,4 +94,3 @@ def comment_approve(request, pk, fk):
     comment.save()
     messages.success(request, 'Comment successfully approved.')
     return redirect('post_detail', pk=post.pk)
-
