@@ -13,11 +13,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path, include
-from django.contrib.auth import views
+from django.urls import include
 from django.contrib.auth.models import User
-from rest_framework import routers, serializers, viewsets
+from rest_framework import routers, serializers, viewsets, permissions
+from posts.api.views import PostViewSet
+from comments.api.views import CommentViewSet
+from user_profiles.api.views import UserProfileViewSet
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -29,16 +32,20 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAdminUser]
 
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
+router.register(r'posts', PostViewSet)
+router.register(r'comments', CommentViewSet)
+router.register(r'user/profile', UserProfileViewSet)
 
 urlpatterns = [
-    path('', include('blog.urls')),
-    path('admin/', admin.site.urls),
-    path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', views.LogoutView.as_view(), name='logout'),
-    path('api/auth/', include('rest_framework.urls')),
-    path('api/', include(router.urls))
+    url(r'^admin/', admin.site.urls),
+    url(r'^api/basic-auth/', include('rest_framework.urls')),
+    url(r'^api/token-auth/', include('rest_auth.urls')),
+    url(r'^api/token-auth/registration/', include('rest_auth.registration.urls')),
 ]
+
+urlpatterns += router.urls
