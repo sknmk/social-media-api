@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timezone
+import pytz
 from django.utils.timesince import timesince
 from rest_framework import serializers
 from posts.models import Post
@@ -7,13 +8,13 @@ from comments.api.serializers import CommentSerializer
 
 class PostSerializer(serializers.ModelSerializer):
     time_since_pub = serializers.SerializerMethodField()
-    author = serializers.StringRelatedField(read_only=True)
+    user = serializers.StringRelatedField(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post
         fields = '__all__'
-        read_only_fields = ['id', 'created_date', 'author', 'comments']
+        read_only_fields = ['id', 'created_date', 'user', 'comments']
         ordering = ['-id']
 
     def get_time_since_pub(self, instance):
@@ -27,7 +28,7 @@ class PostSerializer(serializers.ModelSerializer):
     def validate_published_date(self, published_date):
         if not published_date:
             return None
-        today = published_date.today()
-        if published_date < today:
+        now = datetime.now(pytz.timezone('Europe/Istanbul'))
+        if published_date < now:
             raise serializers.ValidationError('Invalid publish date.')
         return published_date

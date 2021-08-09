@@ -5,5 +5,5 @@ from comments.models import Comment
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = '__all__'
+        exclude = ['user', 'created_date', 'is_deleted']
         ordering = ['-id']
