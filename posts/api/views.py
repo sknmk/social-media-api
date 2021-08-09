@@ -1,9 +1,11 @@
 from django.utils import timezone
 from rest_framework import viewsets
+from rest_framework.filters import SearchFilter, OrderingFilter
 from api.permissions import IsAdminOrIsSelfOrReadOnly
 from api.pagination import SmallPagination
 from posts.models import Post
 from posts.api.serializers import PostSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -11,6 +13,10 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAdminOrIsSelfOrReadOnly]
     pagination_class = SmallPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['user']
+    ordering_fields = ['published_date']
+    search_fields = ['^title']
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
