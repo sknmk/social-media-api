@@ -1,6 +1,7 @@
 from rest_framework import viewsets, response, status
 from django_filters.rest_framework import DjangoFilterBackend
 from comments.models import Comment
+from rest_framework.exceptions import AuthenticationFailed
 from comments.api.serializers import CommentSerializer
 from api.permissions import IsAdminOrIsSelfOrReadOnly
 from api.pagination import SmallPagination
@@ -15,6 +16,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     pagination_class = SmallPagination
 
     def perform_create(self, serializer):
+        if self.request.user.is_anonymous:
+            raise AuthenticationFailed()
         return serializer.save(user=self.request.user)
 
     def list(self, request, *args, **kwargs):

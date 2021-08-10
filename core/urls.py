@@ -22,7 +22,7 @@ from posts.api.views import PostViewSet
 from comments.api.views import CommentViewSet
 from user_profiles.api.views import UserProfileViewSet
 
-
+# TODO: Bunu taşı.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
