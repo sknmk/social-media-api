@@ -7,7 +7,7 @@ from rest_framework.test import APIClient
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 
 from model_mommy import mommy
-from posts.models import Post
+from timeline.posts.models import Post
 
 
 class PostTests(TestCase):

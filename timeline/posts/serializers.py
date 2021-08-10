@@ -1,8 +1,8 @@
 from django.utils.timesince import timesince
 from django.utils import timezone
-from rest_framework import serializers
-from posts.models import Post
-from comments.api.serializers import CommentSerializer
+from rest_framework import serializers, exceptions
+from timeline.posts.models import Post
+from timeline.comments.serializers import CommentSerializer
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -31,3 +31,9 @@ class PostSerializer(serializers.ModelSerializer):
         if published_date < now:
             raise serializers.ValidationError('Invalid publish date.')
         return published_date
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        if user.is_anonymous:
+            raise exceptions.AuthenticationFailed()
+        return Post.objects.create(user=user, **validated_data)

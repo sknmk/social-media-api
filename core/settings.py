@@ -43,9 +43,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'rest_auth.registration',
     'django_extensions',
-    'posts.apps.PostsConfig',
-    'comments.apps.CommentsConfig',
-    'user_profiles.apps.UserProfilesConfig',
+    'timeline.apps.TimelineConfig',
     'django_filters',
 ]
 
