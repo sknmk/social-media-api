@@ -1,17 +1,18 @@
-from rest_framework import serializers, exceptions
+from rest_framework import serializers
 from timeline.comments.models import Comment
+from timeline.posts.models import Post
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    user_full_name = serializers.SerializerMethodField()
+    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
+
+    def get_user_full_name(self, comment):
+        return comment.user.get_full_name()
 
     class Meta:
         model = Comment
-        exclude = ['created_date', 'is_deleted']
+        fields = ['user', 'user_full_name', 'text', 'created_date', 'post']
+        extra_kwargs = {'created_date': {'read_only': True}}
         ordering = ['-id']
-
-    def create(self, validated_data):
-        user = self.context['request'].user
-        if user.is_anonymous:
-            raise exceptions.AuthenticationFailed()
-        return Comment.objects.create(user=user, **validated_data)
