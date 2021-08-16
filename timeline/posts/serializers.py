@@ -25,8 +25,8 @@ class PostSerializer(serializers.ModelSerializer):
         else:
             return 'Post is not published yet.'
 
-    def get_user_full_name(self, comment):
-        return comment.user.get_full_name()
+    def get_user_full_name(self, post):
+        return post.user.get_full_name()
 
     def validate_published_date(self, published_date):
         if not published_date:
@@ -35,4 +35,3 @@ class PostSerializer(serializers.ModelSerializer):
         if published_date < now:
             raise serializers.ValidationError('Invalid publish date.')
         return published_date
-
