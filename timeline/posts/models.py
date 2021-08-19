@@ -2,7 +2,6 @@ from datetime import datetime
 
 from django.db import models
 from django.conf import settings
-from django.utils import timezone
 
 
 class PostManager(models.Manager):
@@ -18,7 +17,7 @@ class Post(models.Model):
     text = models.TextField()
     reactions = models.ManyToManyField('reactions.Reaction', through='reactions.UserReaction',
                                        through_fields=('post', 'reaction',), related_name='posts')
-    created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
     published_date = models.DateTimeField(blank=True, null=True)
     objects = PostManager()
 

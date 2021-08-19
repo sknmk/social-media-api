@@ -8,6 +8,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'url', 'username', 'email', 'is_staff',)
+        ordering = ('-id',)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -16,6 +17,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = '__all__'
+        ordering = ('-id',)
 
     def validate_phone(self, phone):
         if phone and not phonenumbers.is_valid_number(phonenumbers.parse(phone)):

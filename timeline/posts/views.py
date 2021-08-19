@@ -10,7 +10,7 @@ from timeline.posts.filters import PostFilter
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.published_posts()
+    queryset = Post.objects.select_related('user').prefetch_related('user_reactions')
     serializer_class = PostSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
     pagination_class = SmallPagination

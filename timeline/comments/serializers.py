@@ -16,6 +16,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'user', 'user_full_name', 'text', 'created_date', 'post', 'user_reactions' )
+        fields = ('id', 'user', 'user_full_name', 'text', 'created_date', 'post', 'user_reactions')
         extra_kwargs = {'created_date': {'read_only': True}}
         ordering = ('-id',)

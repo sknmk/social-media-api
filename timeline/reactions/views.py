@@ -33,4 +33,4 @@ class UserCommentReactionsViewSet(mixins.ListModelMixin,
     pagination_class = SmallPagination
 
     def get_queryset(self):
-        return super().get_queryset().filter(comment=self.kwargs['comment_pk'])
+        return super().get_queryset().prefetch_related('user', 'post', 'comment').filter(comment=self.kwargs['comment_pk'])

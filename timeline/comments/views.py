@@ -13,7 +13,7 @@ class CommentViewSet(mixins.ListModelMixin,
                      mixins.DestroyModelMixin,
                      mixins.CreateModelMixin,
                      viewsets.GenericViewSet):
-    queryset = Comment.objects.all()
+    queryset = Comment.objects.select_related('user', 'post').prefetch_related('user_reactions')
     serializer_class = CommentSerializer
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)

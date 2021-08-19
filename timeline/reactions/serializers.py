@@ -23,6 +23,7 @@ class UserReactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserReaction
         fields = ('id', 'user', 'user_full_name', 'reaction', 'post', 'when')
+        ordering = ('-id',)
 
     def get_user_full_name(self, obj):
         return obj.user.get_full_name()
