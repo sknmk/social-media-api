@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from user_profiles.models import UserProfile
+from timeline.users.models import UserProfile
 from posts.models import Post
 from django.db.models.signals import post_save
 from django.dispatch import receiver

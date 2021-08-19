@@ -34,10 +34,6 @@ class CommentViewTestCase(TestCase):
         url = reverse('comment-list', kwargs={'post_pk': self.post.pk})
         response = self.client.post(path=url, data={'text': 'Test Comment', 'post': self.post.pk})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        # is created comment accessible?
-        url = reverse('comment-detail', kwargs={'post_pk': self.post.pk, 'pk': response.data['id']})
-        response = self.client.get(path=url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_comment_create_without_auth(self):
         self._logout()

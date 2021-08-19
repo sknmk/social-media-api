@@ -1,21 +1,25 @@
 from django.utils.timesince import timesince
 from django.utils import timezone
 from rest_framework import serializers
+
 from timeline.posts.models import Post
 from timeline.comments.serializers import CommentSerializer
+from timeline.reactions.serializers import UserReactionSerializer
 
 
 class PostSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     user_full_name = serializers.SerializerMethodField()
-    comments = CommentSerializer(many=True, read_only=True)
     time_since_published = serializers.SerializerMethodField()
+    comments = CommentSerializer(many=True, read_only=True)
+    user_reactions = UserReactionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post
-        fields = '__all__'
-        read_only_fields = ['id', 'created_date', 'user', 'comments', 'user_full_name', 'time_since_published']
-        ordering = ['-id']
+        exclude = ('reactions',)
+        read_only_fields = ('id', 'created_date', 'user', 'comments', 'user_reactions', 'user_full_name',
+                            'time_since_published',)
+        ordering = ('-id',)
 
     def get_time_since_published(self, instance):
         now = timezone.now().astimezone()
@@ -25,8 +29,8 @@ class PostSerializer(serializers.ModelSerializer):
         else:
             return 'Post is not published yet.'
 
-    def get_user_full_name(self, post):
-        return post.user.get_full_name()
+    def get_user_full_name(self, obj):
+        return obj.user.get_full_name()
 
     def validate_published_date(self, published_date):
         if not published_date:

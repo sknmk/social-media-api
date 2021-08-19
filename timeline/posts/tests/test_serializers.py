@@ -1,3 +1,5 @@
+import datetime
+
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
@@ -18,7 +20,7 @@ class PostSerializerTestCase(TestCase):
         self.user = mommy.make(User, username=self.username, password=make_password(self.password))
 
     def test_serializer_valid_post(self):
-        data = {'title': 'Test Title', 'slug': 'test-slug', 'text': 'Test Content'}
+        data = {'title': 'Test Title', 'slug': 'test-slug', 'text': 'Test Content', 'published_date': None}
         created_date = timezone.now()
         data['created_date'] = created_date
         factory = RequestFactory().get('/')
@@ -33,6 +35,7 @@ class PostSerializerTestCase(TestCase):
                          'time_since_published': 'Post is not published yet.',
                          'slug': 'test-slug',
                          'title': 'Test Title',
+                         'reactions': [],
                          'text': 'Test Content',
                          'created_date': serializer.data['created_date'],
                          'published_date': None
@@ -40,9 +43,18 @@ class PostSerializerTestCase(TestCase):
         self.assertDictEqual(serializer.data, expected_dict)
 
     def test_serializer_invalid_post(self):
-        data = {'title': 'Test Title', 'slug': 'test slug', 'text': 'Test Content'}
+        data = {'title': 'Test Title', 'slug': 'test-slug', 'text': 'Test Content',
+                'published_date': timezone.now() - datetime.timedelta(days=1)}
         factory = RequestFactory().get('/')
         factory.user = self.user
         serializer = self.serializer_class(data=data, context={'request': factory})
         with self.assertRaises(exceptions.ValidationError):
             serializer.is_valid(raise_exception=True)
+
+    def test_correct_published_date(self):
+        data = {'title': 'Test Title', 'slug': 'test-slug', 'text': 'Test Content',
+                'published_date': timezone.now() + datetime.timedelta(days=1)}
+        factory = RequestFactory().get('/')
+        factory.user = self.user
+        serializer = self.serializer_class(data=data, context={'request': factory})
+        self.assertTrue(serializer.is_valid())

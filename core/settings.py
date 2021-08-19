@@ -44,7 +44,12 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'django_extensions',
     'timeline.apps.TimelineConfig',
+    'timeline.posts',
+    'timeline.comments',
+    'timeline.reactions',
+    'timeline.users',
     'django_filters',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -143,3 +149,7 @@ SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_EMAIL_REQUIRED = (True,)
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]

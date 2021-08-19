@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from django.urls import include
+from django.urls import include, path
+import debug_toolbar
 
 
 urlpatterns = [
@@ -24,4 +25,5 @@ urlpatterns = [
     url(r'^api/token-auth/', include('rest_auth.urls')),
     url(r'^api/token-auth/registration/', include('rest_auth.registration.urls')),
     url(r'^', include('timeline.urls')),
+    path('__debug__/', include(debug_toolbar.urls)),
 ]

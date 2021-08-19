@@ -20,4 +20,4 @@ class CommentViewSet(mixins.ListModelMixin,
     pagination_class = SmallPagination
 
     def get_queryset(self):
-        return Comment.objects.filter(post=self.kwargs['post_pk'])
+        return super().get_queryset().filter(post=self.kwargs['post_pk'])

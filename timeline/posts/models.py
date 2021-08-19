@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -5,16 +7,17 @@ from django.utils import timezone
 
 class PostManager(models.Manager):
     def published_posts(self):
-        return self.filter(published_date__lte=timezone.now()).order_by('published_date')
+        return self.filter(published_date__lte=datetime.now()).order_by('published_date')
 
 
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     slug = models.SlugField(unique=True)
     title = models.CharField(max_length=200)
     text = models.TextField()
+    reactions = models.ManyToManyField('reactions.Reaction', through='reactions.UserReaction',
+                                       through_fields=('post', 'reaction',), related_name='posts')
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
     objects = PostManager()
