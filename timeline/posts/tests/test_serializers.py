@@ -31,11 +31,11 @@ class PostSerializerTestCase(TestCase):
 
         expected_dict = {'id': 1,
                          'user_full_name': '',
+                         'user_reactions': [],
                          'comments': [],
                          'time_since_published': 'Post is not published yet.',
                          'slug': 'test-slug',
                          'title': 'Test Title',
-                         'reactions': [],
                          'text': 'Test Content',
                          'created_date': serializer.data['created_date'],
                          'published_date': None

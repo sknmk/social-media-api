@@ -10,11 +10,13 @@ from timeline.posts.filters import PostFilter
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.select_related('user').prefetch_related('user_reactions__reaction',
-                                                                    'user_reactions__user',
-                                                                    'comments__user',
-                                                                    'comments__user_reactions__reaction',
-                                                                    'comments__user_reactions__user')
+    queryset = Post.objects.published_posts()\
+        .select_related('user')\
+        .prefetch_related('user_reactions__reaction',
+                          'user_reactions__user',
+                          'comments__user',
+                          'comments__user_reactions__reaction',
+                          'comments__user_reactions__user')
     serializer_class = PostSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
     pagination_class = SmallPagination
