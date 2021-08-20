@@ -11,8 +11,8 @@ class CommentSerializer(serializers.ModelSerializer):
     post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all(), write_only=True)
     user_reactions = UserReactionSerializer(many=True, read_only=True)
 
-    def get_user_full_name(self, comment):
-        return comment.user.get_full_name()
+    def get_user_full_name(self, obj):
+        return obj.user.get_full_name()
 
     class Meta:
         model = Comment

@@ -11,7 +11,7 @@ from timeline.users.serializers import UserSerializer
 class UserProfileViewSet(mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin,
                          viewsets.GenericViewSet):
-    queryset = UserProfile.objects.all()
+    queryset = UserProfile.objects.select_related('user')
     lookup_field = 'user_id'
     serializer_class = UserProfileSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)

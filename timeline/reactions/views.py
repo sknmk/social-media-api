@@ -12,7 +12,7 @@ class UserPostReactionsViewSet(mixins.ListModelMixin,
                                mixins.DestroyModelMixin,
                                mixins.CreateModelMixin,
                                viewsets.GenericViewSet):
-    queryset = UserReaction.objects.all()
+    queryset = UserReaction.objects.select_related('reaction', 'user', 'post')
     serializer_class = UserReactionSerializer
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
@@ -26,11 +26,11 @@ class UserCommentReactionsViewSet(mixins.ListModelMixin,
                                   mixins.DestroyModelMixin,
                                   mixins.CreateModelMixin,
                                   viewsets.GenericViewSet):
-    queryset = UserReaction.objects.all()
+    queryset = UserReaction.objects.select_related('reaction', 'user', 'comment')
     serializer_class = UserCommentReactionSerializer
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
     pagination_class = SmallPagination
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('user', 'post', 'comment').filter(comment=self.kwargs['comment_pk'])
+        return super().get_queryset().filter(comment=self.kwargs['comment_pk'])
