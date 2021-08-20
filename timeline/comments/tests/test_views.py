@@ -13,6 +13,7 @@ from timeline.comments.models import Comment
 
 class CommentViewTestCase(TestCase):
     username = 'test'
+    second_username = 'test2'
     password = '123456'
 
     def setUp(self):
@@ -62,8 +63,9 @@ class CommentViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_comment_as_admin(self):
-        self.user.is_staff = True
-        self.user.save()
+        self._logout()
+        mommy.make(User, username=self.second_username, password=make_password(self.password), is_staff=True)
+        self.client.login(username=self.second_username, password=self.password)
         url = reverse('comment-detail', kwargs={'post_pk': self.post.pk, 'pk': self.comment.pk})
         response = self.client.delete(path=url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

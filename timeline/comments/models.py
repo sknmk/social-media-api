@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from timeline.posts.models import Post
 
 
@@ -10,7 +11,7 @@ class Comment(models.Model):
     text = models.TextField()
     reactions = models.ManyToManyField('reactions.Reaction', through='reactions.UserReaction',
                                        through_fields=('comment', 'reaction',), related_name='comments')
-    created_date = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateTimeField(default=timezone.now)
     is_deleted = models.BooleanField(default=False)
 
     def __str__(self):

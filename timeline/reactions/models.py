@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Reaction(models.Model):
@@ -17,7 +18,7 @@ class UserReaction(models.Model):
     post = models.ForeignKey('posts.Post', on_delete=models.CASCADE, related_name='user_reactions', null=True)
     comment = models.ForeignKey('comments.Comment', on_delete=models.CASCADE, related_name='user_reactions', null=True)
     reaction = models.ForeignKey('reactions.Reaction', on_delete=models.CASCADE, related_name='user_reactions')
-    created_date = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateTimeField(default=timezone.now)
     is_deleted = models.BooleanField(default=False)
 
     class Meta:

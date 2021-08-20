@@ -10,14 +10,14 @@ from timeline.users.views import UserProfileViewSet, UserViewSet
 router = routers.DefaultRouter()
 router.register(r'posts', PostViewSet)
 router.register(r'users', UserViewSet)
-router.register(r'user/profile', UserProfileViewSet, basename='user_profile')
+router.register(r'user/profile', UserProfileViewSet, basename='user-profile')
 
 posts_router = nested_routers.NestedSimpleRouter(router, r'posts', lookup='post')
 posts_router.register(r'comments', CommentViewSet)
-posts_router.register(r'reactions', UserPostReactionsViewSet, basename='post_reactions')
+posts_router.register(r'reactions', UserPostReactionsViewSet, basename='post-reactions')
 
 comments_router = nested_routers.NestedSimpleRouter(posts_router, r'comments', lookup='comment')
-comments_router.register(r'reactions', UserCommentReactionsViewSet, basename='comment_reactions')
+comments_router.register(r'reactions', UserCommentReactionsViewSet, basename='comment-reactions')
 
 urlpatterns = [
     url(r'^', include(router.urls)),

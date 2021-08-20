@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from timeline.posts.models import Post
 from timeline.comments.serializers import CommentSerializer
-from timeline.reactions.serializers import UserReactionSerializer
+from timeline.reactions.serializers import UserPostReactionSerializer
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -12,7 +12,7 @@ class PostSerializer(serializers.ModelSerializer):
     user_full_name = serializers.SerializerMethodField()
     time_since_published = serializers.SerializerMethodField()
     comments = CommentSerializer(many=True, read_only=True)
-    user_reactions = UserReactionSerializer(many=True, read_only=True)
+    user_reactions = UserPostReactionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post

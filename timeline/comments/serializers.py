@@ -2,14 +2,14 @@ from rest_framework import serializers
 
 from timeline.comments.models import Comment
 from timeline.posts.models import Post
-from timeline.reactions.serializers import UserReactionSerializer
+from timeline.reactions.serializers import UserCommentReactionSerializer
 
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     user_full_name = serializers.SerializerMethodField()
     post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all(), write_only=True)
-    user_reactions = UserReactionSerializer(many=True, read_only=True)
+    user_reactions = UserCommentReactionSerializer(many=True, read_only=True)
 
     def get_user_full_name(self, obj):
         return obj.user.get_full_name()

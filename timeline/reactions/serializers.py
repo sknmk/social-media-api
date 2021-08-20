@@ -10,13 +10,14 @@ from timeline.comments.models import Comment
 class ReactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reaction
+        depth = 1
         fields = ('name', 'emoji',)
 
 
-class UserReactionSerializer(serializers.ModelSerializer):
+class UserPostReactionSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all(), write_only=True)
-    reaction = serializers.StringRelatedField()
+    reaction = serializers.SlugRelatedField(queryset=Reaction.objects.all(), slug_field='emoji')
     user_full_name = serializers.SerializerMethodField()
     when = serializers.SerializerMethodField()
 
@@ -37,7 +38,7 @@ class UserReactionSerializer(serializers.ModelSerializer):
 class UserCommentReactionSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     comment = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all(), write_only=True)
-    reaction = serializers.StringRelatedField()
+    reaction = serializers.SlugRelatedField(queryset=Reaction.objects.all(), slug_field='emoji')
     user_full_name = serializers.SerializerMethodField()
     when = serializers.SerializerMethodField()
 

@@ -3,7 +3,7 @@ from rest_framework.generics import mixins
 from django_filters.rest_framework import DjangoFilterBackend
 
 from timeline.reactions.models import UserReaction
-from timeline.reactions.serializers import UserReactionSerializer, UserCommentReactionSerializer
+from timeline.reactions.serializers import UserPostReactionSerializer, UserCommentReactionSerializer
 from timeline.pagination import SmallPagination
 from timeline.permissions import IsOwnerOrReadOnly
 
@@ -13,7 +13,7 @@ class UserPostReactionsViewSet(mixins.ListModelMixin,
                                mixins.CreateModelMixin,
                                viewsets.GenericViewSet):
     queryset = UserReaction.objects.select_related('reaction', 'user', 'post')
-    serializer_class = UserReactionSerializer
+    serializer_class = UserPostReactionSerializer
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
     pagination_class = SmallPagination
