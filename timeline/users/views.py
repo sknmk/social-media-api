@@ -3,8 +3,8 @@ from rest_framework import viewsets, permissions
 from rest_framework.generics import mixins
 
 from timeline.permissions import IsOwnerOrReadOnly
-from timeline.users.models import UserProfile
-from timeline.users.serializers import UserProfileSerializer
+from timeline.users.models import UserProfile, UserFollower
+from timeline.users.serializers import UserProfileSerializer, UserFollowerSerializer
 from timeline.users.serializers import UserSerializer
 
 
@@ -21,3 +21,12 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAdminUser,)
+
+
+class UserFollowerViewSet(mixins.ListModelMixin,
+                          mixins.DestroyModelMixin,
+                          mixins.CreateModelMixin,
+                          viewsets.GenericViewSet):
+    queryset = UserFollower.objects.all()
+    serializer_class = UserFollowerSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)

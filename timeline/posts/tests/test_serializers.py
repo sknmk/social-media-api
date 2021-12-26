@@ -36,6 +36,7 @@ class PostSerializerTestCase(TestCase):
                          'time_since_published': 'Post is not published yet.',
                          'slug': 'test-slug',
                          'title': 'Test Title',
+                         'user_following': False,
                          'text': 'Test Content',
                          'created_date': serializer.data['created_date'],
                          'published_date': None

@@ -10,6 +10,7 @@ from timeline.reactions.serializers import UserPostReactionSerializer
 class PostSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     user_full_name = serializers.SerializerMethodField()
+    user_following = serializers.SerializerMethodField()
     time_since_published = serializers.SerializerMethodField()
     comments = CommentSerializer(many=True, read_only=True)
     user_reactions = UserPostReactionSerializer(many=True, read_only=True)
@@ -31,6 +32,12 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_user_full_name(self, obj):
         return obj.user.get_full_name()
+
+    def get_user_following(self, obj):
+        if hasattr(self.context.get('request').user, 'user_follower'):
+            return self.context.get('request').user.user_follower.filter(following=obj.user.pk).exists()
+        else:
+            return False
 
     def validate_published_date(self, published_date):
         if not published_date:

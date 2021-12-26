@@ -8,6 +8,7 @@ from rest_framework import test, status
 
 from model_mommy import mommy
 from timeline.posts.models import Post
+from timeline.users.models import UserFollower
 
 
 class PostViewTestCase(TestCase):
@@ -17,7 +18,7 @@ class PostViewTestCase(TestCase):
 
     def setUp(self):
         self.client = test.APIClient()
-        self.user = mommy.make(User, username=self.username, password=make_password(self.password))
+        self.user = mommy.make(User, username=self.username, password=make_password(self.password), first_name='user1')
         self._login()
         self.post = mommy.make(Post, user=self.user)
         self._publish_post()
@@ -92,22 +93,31 @@ class PostViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_list_filters(self):
-        url = reverse('post-list') + f'?search={self.post.title}'
+        standard_filters = (f'?search={self.post.title}', f'?user={self.post.user.id}')
+        for qp in standard_filters:
+            url = '{}{}'.format(reverse('post-list'), qp)
+            response = self.client.get(path=url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.json()['count'], 1)
+            self.assertEqual(len(response.json()['results']), 1)
+            self.assertEqual(response.json()['results'][0]['title'], self.post.title)
+
+        # Test only follower's posts.
+        user2 = mommy.make(User, username='test2', password=make_password(self.password), first_name='user2')
+        mommy.make(Post, user=user2, published_date=timezone.now() - timezone.timedelta(days=2))
+        user3 = mommy.make(User, username='test3', password=make_password(self.password), first_name='user3')
+        mommy.make(Post, user=user3, published_date=timezone.now() - timezone.timedelta(days=2))
+        mommy.make(UserFollower, user_id=self.user.pk, following=user2)
+
+        url = reverse('post-list')
+        response = self.client.get(path=url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['count'], 3)
+
+        url = '{}{}'.format(reverse('post-list'), f'?only_following_users=true')
         response = self.client.get(path=url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()['count'], 1)
-        self.assertEqual(len(response.json()['results']), 1)
-        self.assertEqual(response.json()['results'][0]['title'], self.post.title)
-
-        posts = Post.objects.filter(user=self.user)
-        self.assertEqual(posts.count(), 1)
-
-        url = reverse('post-list') + f'?user={self.post.user.id}'
-        response = self.client.get(path=url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json()['count'], 1)
-        self.assertEqual(len(response.json()['results']), 1)
-        self.assertEqual(response.json()['results'][0]['title'], self.post.title)
 
     def _publish_post(self):
         self.post.published_date = timezone.now() - timezone.timedelta(days=2)
